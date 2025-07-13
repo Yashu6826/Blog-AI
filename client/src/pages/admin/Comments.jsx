@@ -13,7 +13,7 @@ const Comments = () => {
 
     const fetchComments = async ()=>{
         try {
-          const { data } = await axios.get('/api/admin/comments')
+          const { data } = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/admin/comments`)
           data.success ? setComments(data.comments) : toast.error(data.message)
         } catch (error) {
           toast.error(error.message)

@@ -22,7 +22,7 @@ const Blog = () => {
   const fetchBlogData = async () => {
     try {
       setIsLoading(true)
-      const { data } = await axios.get(`/api/blog/${id}`)
+      const { data } = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/${id}`)
       if (data.success) {
         setData(data.blog)
         fetchRelatedPosts(data.blog.category)
@@ -38,7 +38,7 @@ const Blog = () => {
 
   const fetchRelatedPosts = async (category) => {
     try {
-      const { data } = await axios.get(`/api/blog/related?category=${category}&exclude=${id}`)
+      const { data } = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/related?category=${category}&exclude=${id}`)
       if (data.success) {
         setRelatedPosts(data.posts.slice(0, 3))
       }
@@ -50,7 +50,7 @@ const Blog = () => {
   const fetchComments = async () => {
     try {
       setIsCommentLoading(true)
-      const { data } = await axios.post('/api/blog/comments', { blogId: id })
+      const { data } = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/blog/comments`, { blogId: id })
       if (data.success) {
         setComments(data.comments)
       } else {
@@ -75,7 +75,7 @@ const Blog = () => {
     }
     try {
       setIsCommentLoading(true)
-      const { data } = await axios.post('/api/blog/add-comment', { blog: id, name, content })
+      const { data } = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/blog/add-comment`, { blog: id, name, content })
       if (data.success) {
         toast.success('Comment added successfully')
         setName('')

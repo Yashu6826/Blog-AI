@@ -26,7 +26,7 @@ export const AppProvider = ({ children })=>{
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
 
-    console.log("my key is ",import.meta.env.VITE_BASE_URL);
+    // console.log("my key is ",import.meta.env.VITE_BASE_URL);
 
     const fetchBlogs = async () => {
     try {
