@@ -4,10 +4,17 @@ import {useNavigate} from 'react-router-dom'
 import toast from 'react-hot-toast';
 
 
-axios.defaults.baseURL = 'blog-ai-pi.vercel.app;
-axios.defaults.headers.common['Cache-Control'] = 'no-cache';
-axios.defaults.headers.common['Pragma'] = 'no-cache';
-axios.defaults.headers.common['Expires'] = '0';
+axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+axios.interceptors.request.use((config) => {
+    config.headers = {
+        ...config.headers,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'If-None-Match': null
+    };
+    return config;
+});
 
 const AppContext = createContext();
 
@@ -19,21 +26,28 @@ export const AppProvider = ({ children })=>{
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
 
-    const fetchBlogs = async ()=>{
-        try {
-           const timestamp = new Date().getTime();
-           const {data} = await axios.get(`blog-ai-pi.vercel.app/api/blog/all?t=${timestamp}`, {
-           headers: {
-               'Cache-Control': 'no-cache',
-               'Pragma': 'no-cache',
-               'Expires': '0'
-           }
-       });
-           data.success ? setBlogs(data.blogs) : toast.error(data.message)
-        } catch (error) {
-            toast.error(error.message)
+    const fetchBlogs = async () => {
+    try {
+        const timestamp = new Date().getTime();
+        const {data} = await axios.get(`/api/blog/all`, {
+            params: { timestamp },
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'If-None-Match': null
+            }
+        });
+        if (data.success) {
+            setBlogs(data.blogs);
+        } else {
+            toast.error(data.message);
         }
+    } catch (error) {
+        console.error('Fetch blogs error:', error);
+        toast.error(error.response?.data?.message || error.message);
     }
+}
 
     useEffect(()=>{
         fetchBlogs();
