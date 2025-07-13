@@ -18,7 +18,13 @@ export const AppProvider = ({ children })=>{
 
     const fetchBlogs = async ()=>{
         try {
-           const {data} = await axios.get('/api/blog/all');
+           const {data} = await axios.get('/api/blog/all', {
+           headers: {
+               'Cache-Control': 'no-cache',
+               'Pragma': 'no-cache',
+               'Expires': '0'
+           }
+       });
            data.success ? setBlogs(data.blogs) : toast.error(data.message)
         } catch (error) {
             toast.error(error.message)
