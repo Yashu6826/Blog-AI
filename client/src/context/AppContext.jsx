@@ -29,7 +29,7 @@ export const AppProvider = ({ children })=>{
     const fetchBlogs = async () => {
     try {
         const timestamp = new Date().getTime();
-        const {data} = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/all`, {
+        const {data} = await axios.get(`https://blog-ai-pi.vercel.app/api/blog/all`, {
             params: { timestamp },
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
