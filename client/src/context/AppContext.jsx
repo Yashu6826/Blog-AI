@@ -26,12 +26,12 @@ export const AppProvider = ({ children })=>{
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
 
-    console.log("my key is ",import.meta.env.VITE_SOME_KEY);
+    console.log("my key is ",import.meta.env.VITE_BASE_URL);
 
     const fetchBlogs = async () => {
     try {
         const timestamp = new Date().getTime();
-        const {data} = await axios.get(`${import.meta.env.VITE_SOME_KEY}/api/blog/all`, {
+        const {data} = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/all`, {
             params: { timestamp },
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
