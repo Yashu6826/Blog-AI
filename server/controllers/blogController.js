@@ -80,7 +80,6 @@ export const deleteBlogById = async (req, res) =>{
     }
 }
 
-
 export const togglePublish = async (req, res) =>{
     try {
         const { id } = req.body;
@@ -121,5 +120,28 @@ export const generateContent = async (req, res)=>{
         res.json({success: true, content})
     } catch (error) {
         res.json({success: false, message: error.message})
+    }
+}
+
+export const getTopics = async (req, res) => {
+    try {
+        const prompt = 'Give me 5 unique blog topics related to technology,startups,lifestyle,Finance. Format each topic with its title and category in this format: "Title" - *Category*';
+        const topics = await main(prompt);
+        
+        // Parse the topics string into structured data
+        const parsedTopics = topics.split('\n')
+            .filter(line => line.trim())
+            .map(topic => {
+                const [title, category] = topic.split(' - ');
+                return {
+                    title: title.replace(/^\d+\.\s*\*\*"|"\*\*$/g, ''),
+                    category: category?.replace(/^\*|[\*]$/g, '').trim()
+                };
+            });
+
+        res.json({ success: true, topics: parsedTopics });
+    }
+    catch(error) {
+        res.json({ success: false, message: error.message });
     }
 }

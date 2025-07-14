@@ -5,14 +5,18 @@ import { useAppContext } from '../../context/AppContext';
 import toast from 'react-hot-toast';
 import {parse} from 'marked'
 
+import Loader from '../../components/Loader'
+
 const AddBlog = () => {
 
     const {axios} = useAppContext()
     const [isAdding, setIsAdding] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [topicsloading,setTopicsLoading] = useState(false)
 
     const editorRef = useRef(null)
     const quillRef = useRef(null)
+    const [blogTopics, setBlogTopics] = useState([])
 
     const [image, setImage] = useState(false);
     const [title, setTitle] = useState('');
@@ -35,6 +39,24 @@ const AddBlog = () => {
             toast.error(error.message)
         }finally{
             setLoading(false)
+        }
+    }
+
+    const generateTopics = async ()=>{
+
+        try {
+            setTopicsLoading(true);
+            const {data} = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/blog/give-topics`)
+            console.log(data)
+            if (data.success){
+                setBlogTopics(data.topics)
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }finally{
+            setTopicsLoading(false)
         }
     }
 
@@ -89,7 +111,39 @@ const AddBlog = () => {
             <img src={!image ? assets.upload_area : URL.createObjectURL(image)} alt="" className='mt-2 h-16 rounded cursor-pointer'/>
             <input onChange={(e)=> setImage(e.target.files[0])} type="file" id='image' hidden required/>
         </label>
-
+       <div className="mt-4">
+    <button 
+        type="button"
+        onClick={generateTopics}
+        disabled={loading}
+        className="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90"
+    >
+        {loading ? 'Generating...' : 'Get Blog topics with AI'}
+    </button>
+    { topicsloading && (
+        <Loader/>
+    )}
+   {blogTopics.length > 0 && (
+    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+        <h3 className="font-medium mb-2">Suggested Topics:</h3>
+        <ul className="space-y-3">
+            {blogTopics.map((topic, index) => (
+                <li 
+                    key={index}
+                    className="cursor-pointer hover:bg-gray-100 p-2 rounded"
+                    onClick={() => {
+                        setTitle(topic.title);
+                        setCategory(topic.category);
+                    }}
+                >
+                    <p className="font-medium text-primary">{topic.title}</p>
+                    <span className="text-sm text-gray-500">Category: {topic.category}</span>
+                </li>
+            ))}
+        </ul>
+    </div>
+)}
+</div>
         <p className='mt-4'>Blog title</p>
         <input type="text" placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' onChange={e => setTitle(e.target.value)} value={title}/>
 
