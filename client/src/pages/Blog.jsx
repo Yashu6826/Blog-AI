@@ -152,7 +152,7 @@ const Blog = () => {
               </svg>
             </div>
             <div className="text-left">
-              <p className="font-semibold text-gray-900">Michael Brown</p>
+              <p className="font-semibold text-gray-900">Yashraj Gupta</p>
               <p className="text-sm text-gray-500">Content Creator</p>
             </div>
           </div>
