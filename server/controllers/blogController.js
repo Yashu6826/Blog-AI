@@ -125,7 +125,7 @@ export const generateContent = async (req, res)=>{
 
 export const getTopics = async (req, res) => {
     try {
-        const prompt = 'Give me 5 unique blog topics related to technology,startups,lifestyle,Finance. Format each topic with its title and category in this format: "Title" - *Category*';
+        const prompt = 'Give me 5 unique blog topics related to technology,startups,lifestyle,Finance. Format each topic with its title and category in this format: "Title" - *Category*. strictly give the topic thats it nothing else. No introduction text nothings just topics.';
         const topics = await main(prompt);
         
         // Parse the topics string into structured data
