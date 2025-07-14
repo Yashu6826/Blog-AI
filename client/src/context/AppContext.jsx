@@ -2,6 +2,8 @@ import {createContext, useContext, useEffect, useState} from 'react'
 import axios from "axios";
 import {useNavigate} from 'react-router-dom'
 import toast from 'react-hot-toast';
+import Loader from '../components/Loader';
+
 
 
 // axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
@@ -25,11 +27,13 @@ export const AppProvider = ({ children })=>{
     const [token, setToken] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
+    const [loading,setLoading] = useState(false)
 
     // console.log("my key is ",import.meta.env.VITE_BASE_URL);
 
     const fetchBlogs = async () => {
     try {
+        setLoading(true);
         const timestamp = new Date().getTime();
         const {data} = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/all`, {
             params: { timestamp },
@@ -48,6 +52,8 @@ export const AppProvider = ({ children })=>{
     } catch (error) {
         console.error('Fetch blogs error:', error);
         toast.error(error.response?.data?.message || error.message);
+    }finally{
+        setLoading(false);
     }
 }
 
@@ -66,7 +72,7 @@ export const AppProvider = ({ children })=>{
 
     return (
         <AppContext.Provider value={value}>
-            {children}
+             {loading ? <Loader /> : children}
         </AppContext.Provider>
     )
 }
