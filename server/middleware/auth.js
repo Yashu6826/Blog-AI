@@ -7,7 +7,8 @@ const auth = (req, res, next)=>{
         jwt.verify(token, process.env.JWT_SECRET)
         next();
     } catch (error) {
-        res.json({success: false, message: "Invalid token"})
+        // res.json({success: false, message: "Invalid token"})
+        console.log("invalid token")
     }
 }
 
