@@ -22,7 +22,7 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Home/>} />
         <Route path='/blog/:id' element={<Blog/>} />
-        <Route path='/admin' element={token ? <Layout/> : <Login/>}>
+        <Route path='/admin' element={ <Layout/>}>
           <Route index element={<Dashboard/>}/>
           <Route path='addBlog' element={<AddBlog/>}/>
           <Route path='listBlog' element={<ListBlog/>}/>
