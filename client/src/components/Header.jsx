@@ -18,32 +18,82 @@ const Header = () => {
   }
 
   return (
-    <div className='mx-8 sm:mx-16 xl:mx-24 relative'>
-      <div className='text-center mt-20 mb-8'>
+    <div className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50'>
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0)`,
+          backgroundSize: '40px 40px'
+        }}></div>
+      </div>
 
-        <div className='inline-flex items-center justify-center gap-4 px-6 py-1.5 mb-4 border border-primary/40 bg-primary/10 rounded-full text-sm text-primary'>
-            <p>New: AI feature integrated</p>
-            <img src={assets.star_icon} className='w-2.5' alt="" />
+      <div className='max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 relative'>
+        <div className='text-center pt-16 pb-12'>
+
+          {/* Badge */}
+          <div className='inline-flex items-center gap-3 px-4 py-2 mb-6 border border-blue-200 bg-blue-50 rounded-full text-sm text-blue-700 font-medium'>
+            <span className='relative flex h-2 w-2'>
+              <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75'></span>
+              <span className='relative inline-flex rounded-full h-2 w-2 bg-blue-500'></span>
+            </span>
+            <p>AI-Powered Blogging Platform</p>
+          </div>
+
+          {/* Main Heading */}
+          <h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight'>
+            <span className='text-gray-900'>Your own</span>
+            {' '}
+            <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>blogging</span>
+            {' '}
+            <span className='text-gray-900'>platform</span>
+          </h1>
+
+          {/* Subheading */}
+          <p className='text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8'>
+            Your space to think out loud, share what matters, and write without filters.
+          </p>
+
+          {/* Search Bar */}
+          <div className='max-w-2xl mx-auto mb-3'>
+            <form onSubmit={onSubmitHandler} className='relative group'>
+              <div className='relative flex items-center bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-all duration-300'>
+                <div className='pl-5 text-gray-400'>
+                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                  </svg>
+                </div>
+                <input 
+                  ref={inputRef} 
+                  type="text" 
+                  placeholder='Search articles, topics, or categories...' 
+                  required 
+                  className='w-full py-3 px-3 outline-none bg-transparent text-gray-900 placeholder-gray-400'
+                />
+                <button 
+                  type="submit" 
+                  className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2.5 m-1 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200'
+                >
+                  Search
+                </button>
+              </div>
+            </form>
+          </div>
+
+          {/* Clear Button */}
+          {input && (
+            <button 
+              onClick={onClear} 
+              className='inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200'
+            >
+              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+              </svg>
+              Clear search
+            </button>
+          )}
+
         </div>
-
-        <h1 className='text-3xl sm:text-6xl font-semibold sm:leading-16 text-gray-700'>Your own <span className='text-primary'> blogging</span> <br/> platform.</h1>
-
-        <p className='my-6 sm:my-8 max-w-2xl m-auto max-sm:text-xs text-gray-500'>This is your space to think out loud, to share what matters, and to write without filters. Whether it's one word or a thousand, your story starts right here.</p>
-
-        <form onSubmit={onSubmitHandler} className='flex justify-between max-w-lg max-sm:scale-75 mx-auto border border-gray-300 bg-white rounded overflow-hidden'>
-            <input ref={inputRef} type="text" placeholder='Search for blogs' required className='w-full pl-4 outline-none'/>
-            <button type="submit" className='bg-primary text-white px-8 py-2 m-1.5 rounded hover:scale-105 transition-all cursor-pointer'>Search</button>
-        </form>
-
       </div>
-
-      <div className='text-center'>
-        {
-        input && <button onClick={onClear} className='border font-light text-xs py-1 px-3 rounded-sm shadow-custom-sm cursor-pointer'>Clear Search</button>
-        }
-      </div>
-
-      <img src={assets.gradientBackground} alt="" className='absolute -top-50 -z-1 opacity-50'/>
     </div>
   )
 }

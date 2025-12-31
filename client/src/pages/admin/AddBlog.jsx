@@ -59,7 +59,20 @@ const AddBlog = () => {
             setTopicsLoading(false)
         }
     }
+const cleanTitle = (rawTitle) => {
+    if (!rawTitle) return '';
 
+    // If array → take first item
+    if (Array.isArray(rawTitle)) {
+        return rawTitle[0].replace(/^"+|"+$/g, '').trim();
+    }
+
+    // If string with commas & quotes
+    return rawTitle
+        .split(',')[0]          // take first title
+        .replace(/^"+|"+$/g, '') // remove surrounding quotes
+        .trim();
+};
     const onSubmitHandler = async (e) =>{
         try {
             e.preventDefault();
@@ -115,34 +128,48 @@ const AddBlog = () => {
     <button 
         type="button"
         onClick={generateTopics}
-        disabled={loading}
-        className="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90"
+        disabled={topicsloading}
+        className={`inline-flex items-center mb-3 cursor-pointer gap-2 bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90 ${topicsloading ? 'opacity-90 cursor-not-allowed' : ''}`}
     >
-        {loading ? 'Generating...' : 'Get Blog topics with AI'}
+        {topicsloading && (
+            <span className="inline-block w-4 h-4 border-2 border-white/70 border-t-white rounded-full animate-spin"></span>
+        )}
+        <span>{topicsloading ? 'Generating…' : 'Get blog topics with AI'}</span>
     </button>
-    { topicsloading && (
-        <Loader/>
+    {topicsloading && (
+        <div className="mt-3 space-y-2">
+            <div className="h-10 rounded bg-gray-200 animate-pulse"></div>
+            <div className="h-10 rounded bg-gray-200 animate-pulse"></div>
+            <div className="h-10 rounded bg-gray-200 animate-pulse"></div>
+        </div>
     )}
-   {blogTopics.length > 0 && (
-    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-medium mb-2">Suggested Topics:</h3>
-        <ul className="space-y-3">
-            {blogTopics.map((topic, index) => (
-                <li 
-                    key={index}
-                    className="cursor-pointer hover:bg-gray-100 p-2 rounded"
-                    onClick={() => {
-                        setTitle(topic.title);
-                        setCategory(topic.category);
-                    }}
-                >
-                    <p className="font-medium text-primary">{topic.title}</p>
-                    <span className="text-sm text-gray-500">Category: {topic.category}</span>
-                </li>
-            ))}
-        </ul>
-    </div>
-)}
+    {blogTopics.map((topic, index) => {
+    const title = cleanTitle(topic.title);
+
+    return (
+        <li
+            key={index}
+            className="cursor-pointer p-3 rounded border border-gray-200 hover:border-primary/60 hover:bg-primary/5 transition"
+            onClick={() => {
+                setTitle(title);
+                setCategory(topic.category);
+            }}
+        >
+            <div className="flex items-center justify-between">
+                <p className="font-medium text-gray-800">
+                    {title}
+                </p>
+
+                {topic.category && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        {topic.category}
+                    </span>
+                )}
+            </div>
+        </li>
+    );
+})}
+
 </div>
         <p className='mt-4'>Blog title</p>
         <input type="text" placeholder='Type here' required className='w-full max-w-lg mt-2 p-2 border border-gray-300 outline-none rounded' onChange={e => setTitle(e.target.value)} value={title}/>

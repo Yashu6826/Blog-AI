@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { assets, dashboard_data } from '../../assets/assets'
+import { assets } from '../../assets/assets'
 import BlogTableItem from '../../components/admin/BlogTableItem'
 import { useAppContext } from '../../context/AppContext'
 import toast from 'react-hot-toast'
@@ -72,7 +72,7 @@ const Dashboard = () => {
                             <th scope='col' className='px-2 py-4'> Blog Title </th>
                             <th scope='col' className='px-2 py-4 max-sm:hidden'> Date </th>
                             <th scope='col' className='px-2 py-4 max-sm:hidden'> Status </th>
-                            <th scope='col' className='px-2 py-4'> Actions </th>
+                            {/* <th scope='col' className='px-2 py-4'> Actions </th> */}
                         </tr>
                     </thead>
                     <tbody>
