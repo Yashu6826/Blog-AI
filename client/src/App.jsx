@@ -3,19 +3,25 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
 import Layout from './pages/admin/Layout';
-import Dashboard from './pages/admin/Dashboard';
 import AddBlog from './pages/admin/AddBlog';
-import ListBlog from './pages/admin/ListBlog';
-import Comments from './pages/admin/Comments';
-import Login from './components/admin/Login';
+import Auth from './pages/Auth';
 import 'quill/dist/quill.snow.css';
 import { Toaster } from 'react-hot-toast';
 import { useAppContext } from './context/AppContext';
+import Loader from './components/Loader';
 
 // PrivateRoute component: protects specific routes
 const PrivateRoute = ({ children }) => {
-  const { token } = useAppContext();
-  return token ? children : <Navigate to="/admin/login" replace />;
+  const { token, authReady } = useAppContext();
+  if (!authReady) return <Loader />;
+  return token ? children : <Navigate to="/auth?mode=login" replace />;
+};
+
+const OwnerRoute = ({ children }) => {
+  const { token, authReady, canWrite } = useAppContext();
+  if (!authReady) return <Loader />;
+  if (!token) return <Navigate to="/auth?mode=login" replace />;
+  return canWrite ? children : <Navigate to="/" replace />;
 };
 
 const App = () => {
@@ -26,44 +32,19 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blog/:id" element={<Blog />} />
+        <Route path="/auth" element={<Auth />} />
 
-        {/* Login page */}
-        <Route path="/admin/login" element={<Login />} />
+        <Route path="/admin/login" element={<Navigate to="/auth?mode=login" replace />} />
 
-        {/* All admin routes use the same Layout (with Sidebar always visible) */}
         <Route path="/admin" element={<Layout />}>
-          {/* Public route - anyone can access */}
-          <Route path="addBlog" element={<AddBlog />} />
-
-          {/* Protected routes - require login */}
-          <Route
-            index
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="listBlog"
-            element={
-              <PrivateRoute>
-                <ListBlog />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="comments"
-            element={
-              <PrivateRoute>
-                <Comments />
-              </PrivateRoute>
-            }
-          />
+          <Route path="addBlog" element={<OwnerRoute><AddBlog /></OwnerRoute>} />
+          <Route index element={<Navigate to="/" replace />} />
+          <Route path="stories" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
+          <Route path="listBlog" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
+          <Route path="comments" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
         </Route>
 
-        {/* Optional: Catch-all redirect for unknown admin routes */}
-        <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );

@@ -24,10 +24,13 @@ export const AppProvider = ({ children })=>{
 
     const navigate = useNavigate()
 
-    const [token, setToken] = useState(null)
+    const [token, setToken] = useState(() => localStorage.getItem('token'))
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+    const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
     const [loading,setLoading] = useState(false)
+    const [authReady, setAuthReady] = useState(false)
 
     // console.log("my key is ",import.meta.env.VITE_BASE_URL);
 
@@ -59,15 +62,32 @@ export const AppProvider = ({ children })=>{
 
     useEffect(()=>{
         fetchBlogs();
-        const token = localStorage.getItem('token')
         if(token){
-            setToken(token);
             axios.defaults.headers.common['Authorization'] = `${token}`;
+            axios.get(`${import.meta.env.VITE_BASE_URL}/api/users/me`).then(({data}) => {
+                if (data.success) setUser(data.user)
+            }).catch(() => {
+                localStorage.removeItem('token')
+                delete axios.defaults.headers.common['Authorization']
+                setToken(null)
+                setUser(null)
+            }).finally(() => setAuthReady(true))
+        } else {
+            delete axios.defaults.headers.common['Authorization']
+            setAuthReady(true)
         }
-    },[])
+    },[token])
+
+    useEffect(() => {
+        document.documentElement.dataset.theme = theme
+        localStorage.setItem('theme', theme)
+    }, [theme])
+
+    const canWrite = user?.email?.toLowerCase() === 'yashrajgupta306@gmail.com'
+    const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark')
 
     const value = {
-        axios, navigate, token, setToken, blogs, setBlogs, input, setInput
+        axios, navigate, token, setToken, user, setUser, blogs, setBlogs, input, setInput, authReady, canWrite, theme, toggleTheme
     }
 
     return (

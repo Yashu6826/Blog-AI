@@ -1,101 +1,35 @@
-import React, { useRef } from 'react'
-import { assets } from '../assets/assets'
-import { useAppContext } from '../context/AppContext'
+import React from 'react'
 
 const Header = () => {
-
-  const {setInput, input} = useAppContext()
-  const inputRef = useRef()
-
-  const onSubmitHandler = async (e)=>{
-     e.preventDefault();
-     setInput(inputRef.current.value)
-  }
-
-  const onClear = ()=>{
-    setInput('')
-    inputRef.current.value = ''
-  }
-
   return (
-    <div className='relative overflow-hidden bg-gradient-to-b from-white to-gray-50'>
-      {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }}></div>
+    <section id='intro' className='relative w-full overflow-hidden border-b border-[var(--border-soft)] bg-[var(--bg-page)]'>
+      <div className='absolute inset-0 bg-[linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] bg-[size:70px_70px]' />
+      <div className='relative mx-auto w-full max-w-screen-2xl px-4 pb-20 pt-12 sm:px-6 sm:pb-24 sm:pt-14 lg:px-8 lg:pb-32 lg:pt-20'>
+        <p className='font-mono text-xs font-semibold uppercase tracking-[0.45em] text-[var(--accent)]'>
+          * logging since 2025 * long-form commits
+        </p>
+        <h1 className='mt-8 max-w-5xl text-4xl font-bold leading-[1.08] tracking-tight text-[var(--text-strong)] sm:text-6xl lg:text-7xl'>
+          Notes from building products <span className='text-[var(--text-faint)]'>- the decisions, bugs, launches and lessons.</span>
+        </h1>
+        <p className='mt-8 max-w-3xl text-lg leading-8 text-[var(--text-muted)] sm:text-xl'>
+          A quiet log for practical engineering notes, product thinking, AI experiments, and the occasional hard-earned opinion.
+        </p>
+
+        <dl className='mt-14 grid max-w-4xl overflow-hidden rounded-lg border border-[var(--border-main)] bg-[var(--bg-elevated)] sm:grid-cols-2 lg:grid-cols-4'>
+          {[
+            ['Stack', 'Full-stack products'],
+            ['Runtime', 'Software Engineer'],
+            ['Region', 'Bengaluru, IN'],
+            ['Longest trace', '14 min'],
+          ].map(([label, value]) => (
+            <div key={label} className='border-b border-[var(--border-soft)] p-5 last:border-b-0 sm:border-r sm:last:border-r-0 lg:border-b-0'>
+              <dt className='font-mono text-[11px] uppercase tracking-[0.45em] text-[var(--text-dim)]'>{label}</dt>
+              <dd className='mt-3 text-base font-bold leading-6 text-[var(--text-strong)]'>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
-
-      <div className='max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 relative'>
-        <div className='text-center pt-16 pb-12'>
-
-          {/* Badge */}
-          <div className='inline-flex items-center gap-3 px-4 py-2 mb-6 border border-blue-200 bg-blue-50 rounded-full text-sm text-blue-700 font-medium'>
-            <span className='relative flex h-2 w-2'>
-              <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75'></span>
-              <span className='relative inline-flex rounded-full h-2 w-2 bg-blue-500'></span>
-            </span>
-            <p>AI-Powered Blogging Platform</p>
-          </div>
-
-          {/* Main Heading */}
-          <h1 className='text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight'>
-            <span className='text-gray-900'>Your own</span>
-            {' '}
-            <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>blogging</span>
-            {' '}
-            <span className='text-gray-900'>platform</span>
-          </h1>
-
-          {/* Subheading */}
-          <p className='text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8'>
-            Your space to think out loud, share what matters, and write without filters.
-          </p>
-
-          {/* Search Bar */}
-          <div className='max-w-2xl mx-auto mb-3'>
-            <form onSubmit={onSubmitHandler} className='relative group'>
-              <div className='relative flex items-center bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl transition-all duration-300'>
-                <div className='pl-5 text-gray-400'>
-                  <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-                  </svg>
-                </div>
-                <input 
-                  ref={inputRef} 
-                  type="text" 
-                  placeholder='Search articles, topics, or categories...' 
-                  required 
-                  className='w-full py-3 px-3 outline-none bg-transparent text-gray-900 placeholder-gray-400'
-                />
-                <button 
-                  type="submit" 
-                  className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2.5 m-1 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-200'
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Clear Button */}
-          {input && (
-            <button 
-              onClick={onClear} 
-              className='inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200'
-            >
-              <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
-              </svg>
-              Clear search
-            </button>
-          )}
-
-        </div>
-      </div>
-    </div>
+    </section>
   )
 }
-
 export default Header

@@ -3,6 +3,6 @@ uvicorn
 motor
 PyJWT
 imagekitio
-google-genai
 python-dotenv
 python-multipart
+google-auth

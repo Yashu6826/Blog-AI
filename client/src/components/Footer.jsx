@@ -1,36 +1,18 @@
 import React from 'react'
-import { assets, footer_data } from '../assets/assets'
+import { FolderGit2, House, UserCircle2 } from 'lucide-react'
 
-const Footer = () => {
-  return (
-    <div className='px-6 md:px-16 lg:px-24 xl:px-32 bg-primary/3'>
-      <div className='flex flex-col md:flex-row items-start justify-between gap-10 py-10 border-b border-gray-500/30 text-gray-500'>
-
-        <div>
-            <img src={assets.logo} alt="logo" className='w-32 sm:w-44'/>
-            <p className='max-w-[410px] mt-6'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Rerum unde quaerat eveniet cumque accusamus atque qui error quo enim fugiat?</p>
-        </div>
-
-        <div className='flex flex-wrap justify-between w-full md:w-[45%] gap-5'>
-            {footer_data.map((section, index)=> (
-                <div key={index}>
-                    <h3 className='font-semibold text-base text-gray-900 md:mb-5 mb-2'>{section.title}</h3>
-                    <ul className='text-sm space-y-1'>
-                        {section.links.map((link, i)=> (
-                            <li key={i}>
-                                <a href="#" className='hover:underline transition'>{link}</a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
-        </div>
-
-
+const Footer = () => (
+  <footer className='border-t border-[var(--border-soft)] bg-[var(--bg-page)] px-5 text-[var(--text-faint)] sm:px-8'>
+    <div className='mx-auto flex max-w-[1320px] flex-col gap-6 py-8 font-mono text-sm sm:flex-row sm:items-center sm:justify-between'>
+      <p><span className='text-[var(--text-strong)]'>QuickBlog</span><span className='text-[var(--accent)]'>/log</span></p>
+      <div className='flex flex-wrap gap-5'>
+        <a href='#feed' className='inline-flex items-center gap-2 hover:text-[var(--accent)]'><House className='h-4 w-4' />root</a>
+        <a href='#archive' className='inline-flex items-center gap-2 hover:text-[var(--accent)]'><FolderGit2 className='h-4 w-4' />commits</a>
+        <a href='#about' className='inline-flex items-center gap-2 hover:text-[var(--accent)]'><UserCircle2 className='h-4 w-4' />profile</a>
       </div>
-      <p className='py-4 text-center text-sm md:text-base text-gray-500/80'>Copyright 2025 © YashBlog - All Right Reserved.</p>
+      <p>(c) {new Date().getFullYear()} QuickBlog</p>
     </div>
-  )
-}
+  </footer>
+)
 
 export default Footer
