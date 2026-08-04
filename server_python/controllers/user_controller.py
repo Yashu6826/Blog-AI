@@ -28,7 +28,7 @@ def _verify_password(password, stored):
         return False
 
 def _public(user):
-    return {"id": str(user["_id"]), "name": user["name"], "email": user["email"], "bio": user.get("bio", ""), "role": user.get("role", "author"), "createdAt": user.get("createdAt")}
+    return {"id": str(user["_id"]), "name": user["name"], "email": user["email"], "picture": user.get("picture", ""), "bio": user.get("bio", ""), "role": user.get("role", "author"), "createdAt": user.get("createdAt")}
 
 def _token(user):
     return jwt.encode({"sub": str(user["_id"]), "email": user["email"], "role": user.get("role", "author")}, os.getenv("JWT_SECRET"), algorithm="HS256")
@@ -72,13 +72,20 @@ async def google_login(credential):
 
     db = get_db()
     user = await db["users"].find_one({"email": email})
+    picture = info.get("picture") or ""
     if user:
-        await db["users"].update_one({"_id": user["_id"]}, {"$set": {"name": info.get("name") or user.get("name", "QuickBlog Author"), "updatedAt": datetime.utcnow().isoformat()}})
-        user.update({"name": info.get("name") or user.get("name", "QuickBlog Author")})
+        updates = {
+            "name": info.get("name") or user.get("name", "QuickBlog Author"),
+            "picture": picture or user.get("picture", ""),
+            "updatedAt": datetime.utcnow().isoformat(),
+        }
+        await db["users"].update_one({"_id": user["_id"]}, {"$set": updates})
+        user.update(updates)
     else:
         user = {
             "name": info.get("name") or "QuickBlog Author",
             "email": email,
+            "picture": picture,
             "passwordHash": "",
             "bio": "",
             "role": "author",
