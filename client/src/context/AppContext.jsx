@@ -49,7 +49,7 @@ export const AppProvider = ({ children })=>{
     const navigate = useNavigate()
 
     const [token, setToken] = useState(() => localStorage.getItem('token'))
-    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark')
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light')
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
