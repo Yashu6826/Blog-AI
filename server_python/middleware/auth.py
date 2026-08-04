@@ -16,6 +16,15 @@ async def get_current_user(authorization: str | None = Header(default=None)):
     if not user: raise HTTPException(status_code=401, detail="This action requires a user account")
     return user
 
+async def get_optional_user(authorization: str | None = Header(default=None)):
+    if not authorization:
+        return None
+    try:
+        payload = _decode(authorization)
+        return await get_db()["users"].find_one({"_id": ObjectId(payload.get("sub"))})
+    except Exception:
+        return None
+
 def get_current_admin(authorization: str | None = Header(default=None)):
     payload = _decode(authorization)
     if payload.get("role") != "admin" and payload.get("email") != os.getenv("ADMIN_EMAIL"):

@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { EyeOff, Trash2 } from 'lucide-react'
 import { useAppContext } from '../context/AppContext'
 import AboutMe from './AboutMe'
 
@@ -74,19 +76,24 @@ const staticPosts = [
 
 const fallbackCategories = ['all', 'Systems', 'Frontend', 'AI', 'Infra', 'Career']
 
+const skeletonPosts = [
+  { key: 'skeleton-1', featured: true, span: 'lg:col-span-2' },
+  { key: 'skeleton-2', span: '' },
+  { key: 'skeleton-3', span: '' },
+  { key: 'skeleton-4', span: 'lg:col-span-2' },
+  { key: 'skeleton-5', span: '' },
+  { key: 'skeleton-6', span: '' },
+]
+
 const BlogList = () => {
   const [sort, setSort] = useState('recent')
   const [category, setCategory] = useState('all')
-  const { blogs, input, setInput } = useAppContext()
+  const [busyBlogId, setBusyBlogId] = useState('')
+  const { axios, blogs, blogsLoading, canWrite, fetchBlogs, input, setInput } = useAppContext()
   const navigate = useNavigate()
 
   const posts = useMemo(() => {
-    if (!blogs.length) {
-      return staticPosts.map((post, index) => ({
-        ...post,
-        sourceId: blogs[index]?._id,
-      }))
-    }
+    if (!blogs.length) return []
 
     return blogs.map((blog) => ({
       title: blog.title,
@@ -102,6 +109,8 @@ const BlogList = () => {
     }))
   }, [blogs])
 
+  const previewPosts = blogsLoading ? staticPosts : posts
+
   const filteredPosts = posts.filter((post) => {
     const query = input.trim().toLowerCase()
     const matchesSearch = !query || [post.title, post.excerpt, post.category, post.level, ...post.tags].join(' ').toLowerCase().includes(query)
@@ -115,15 +124,49 @@ const BlogList = () => {
     return 0
   })
 
-  const categories = ['all', ...Array.from(new Set(posts.map((post) => post.category))).filter(Boolean)]
+  const categories = ['all', ...Array.from(new Set(previewPosts.map((post) => post.category))).filter(Boolean)]
 
   const categoryCounts = (categories.length > 1 ? categories : fallbackCategories).map((item) => ({
     name: item,
-    count: item === 'all' ? posts.length : posts.filter((post) => post.category === item).length,
+    count: item === 'all' ? previewPosts.length : previewPosts.filter((post) => post.category === item).length,
   }))
 
   const openPost = (post) => {
     if (post.sourceId) navigate(`/blog/${post.sourceId}`)
+  }
+
+  const unpublishPost = async (event, post) => {
+    event.stopPropagation()
+    if (!post.sourceId) return
+    setBusyBlogId(post.sourceId)
+    try {
+      const { data } = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/blog/toggle-publish`, { id: post.sourceId })
+      if (!data.success) return toast.error(data.message)
+      toast.success('Moved back to drafts.')
+      await fetchBlogs()
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Could not move that log back to drafts.')
+    } finally {
+      setBusyBlogId('')
+    }
+  }
+
+  const deletePost = async (event, post) => {
+    event.stopPropagation()
+    if (!post.sourceId) return
+    const confirmed = window.confirm(`Delete "${post.title}"?`)
+    if (!confirmed) return
+    setBusyBlogId(post.sourceId)
+    try {
+      const { data } = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/blog/delete`, { id: post.sourceId })
+      if (!data.success) return toast.error(data.message)
+      toast.success('Log deleted.')
+      await fetchBlogs()
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Could not delete that log.')
+    } finally {
+      setBusyBlogId('')
+    }
   }
 
   const getCardSpan = (post, index, featured) => {
@@ -137,7 +180,41 @@ const BlogList = () => {
 
   const PostCard = ({ post, index, featured = false, className = '' }) => (
     <article className={`spark-card group relative flex min-w-0 overflow-hidden border-[var(--border-main)] bg-[var(--bg-panel)] p-5 transition hover:bg-[var(--bg-elevated)] sm:p-6 ${featured ? 'min-h-[520px] lg:p-8' : 'min-h-[360px]'} ${getCardSpan(post, index, featured)} ${className}`}>
-      <button onClick={() => openPost(post)} disabled={!post.sourceId} className='flex h-full min-w-0 flex-col text-left'>
+      {canWrite && post.sourceId && (
+        <div className='absolute right-4 top-4 z-10 flex items-center gap-2'>
+          <button
+            type='button'
+            onClick={(event) => unpublishPost(event, post)}
+            disabled={busyBlogId === post.sourceId}
+            title='Move this log back to drafts'
+            className='rounded-md border border-[var(--border-main)] bg-[var(--bg-elevated)] p-2 text-[var(--text-link)] transition hover:border-[var(--accent-border)] hover:text-[var(--accent)] disabled:opacity-50'
+          >
+            <EyeOff className='h-4 w-4' />
+          </button>
+          <button
+            type='button'
+            onClick={(event) => deletePost(event, post)}
+            disabled={busyBlogId === post.sourceId}
+            title='Delete this log'
+            className='rounded-md border border-[var(--border-main)] bg-[var(--bg-elevated)] p-2 text-[var(--text-link)] transition hover:border-red-500/50 hover:text-red-400 disabled:opacity-50'
+          >
+            <Trash2 className='h-4 w-4' />
+          </button>
+        </div>
+      )}
+
+      <div
+        onClick={() => openPost(post)}
+        onKeyDown={(event) => {
+          if ((event.key === 'Enter' || event.key === ' ') && post.sourceId) {
+            event.preventDefault()
+            openPost(post)
+          }
+        }}
+        role={post.sourceId ? 'button' : undefined}
+        tabIndex={post.sourceId ? 0 : -1}
+        className={`flex h-full min-w-0 flex-col text-left ${post.sourceId ? 'cursor-pointer' : 'cursor-default'}`}
+      >
         <div className='flex items-start justify-between gap-4 font-mono text-xs uppercase tracking-[0.24em] text-[var(--text-dim)]'>
           <span className='text-[var(--accent)]'>{String(index + 1).padStart(2, '0')}</span>
           <span>{post.category}</span>
@@ -179,19 +256,73 @@ const BlogList = () => {
             <span className='font-mono text-sm text-[var(--text-link)] transition group-hover:text-[var(--accent)]'>open -&gt;</span>
           </div>
         </div>
-      </button>
+      </div>
     </article>
   )
 
   const lead = visiblePosts[0]
   const remainingPosts = visiblePosts.slice(1)
 
+  const SkeletonCard = ({ index, featured = false, className = '', span = '' }) => (
+    <article className={`spark-card relative flex min-w-0 overflow-hidden border-[var(--border-main)] bg-[var(--bg-panel)] p-5 sm:p-6 ${featured ? 'min-h-[520px] lg:p-8' : 'min-h-[360px]'} ${span} ${className}`}>
+      <div className='flex h-full min-w-0 flex-1 flex-col animate-pulse'>
+        <div className='flex items-start justify-between gap-4 font-mono text-xs uppercase tracking-[0.24em] text-[var(--text-dim)]'>
+          <span className='h-4 w-7 rounded bg-[var(--bg-soft)]' />
+          <span className='h-4 w-20 rounded bg-[var(--bg-soft)]' />
+        </div>
+
+        <div className={`min-w-0 ${featured ? 'mt-16 lg:mt-24' : 'mt-12'}`}>
+          <div className='flex flex-wrap items-center gap-2'>
+            <span className='h-3 w-24 rounded bg-[var(--bg-soft)]' />
+            <span className='h-3 w-3 rounded bg-[var(--bg-soft)]' />
+            <span className='h-3 w-20 rounded bg-[var(--bg-soft)]' />
+            <span className='h-3 w-3 rounded bg-[var(--bg-soft)]' />
+            <span className='h-3 w-24 rounded bg-[var(--bg-soft)]' />
+          </div>
+
+          <div className='mt-4 space-y-3'>
+            <div className={`h-8 rounded bg-[var(--bg-soft)] ${featured ? 'w-11/12 sm:h-14' : 'w-5/6'}`} />
+            <div className={`h-8 rounded bg-[var(--bg-soft)] ${featured ? 'w-3/4 sm:h-14' : 'w-4/6'}`} />
+          </div>
+
+          <div className='mt-5 space-y-3'>
+            <div className='h-4 w-full rounded bg-[var(--bg-soft)]' />
+            <div className='h-4 w-11/12 rounded bg-[var(--bg-soft)]' />
+            <div className='h-4 w-4/5 rounded bg-[var(--bg-soft)]' />
+          </div>
+        </div>
+
+        <div className='mt-auto pt-8'>
+          {featured && (
+            <div className='mb-7 grid gap-3 sm:grid-cols-2'>
+              {Array.from({ length: 2 }).map((_, bulletIndex) => (
+                <div key={`${index}-bullet-${bulletIndex}`} className='flex gap-3'>
+                  <span className='mt-2 h-2 w-2 rounded-full bg-[var(--accent)]/60' />
+                  <span className='h-4 w-full rounded bg-[var(--bg-soft)]' />
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className='flex flex-wrap items-center justify-between gap-4'>
+            <div className='flex flex-wrap gap-2'>
+              {Array.from({ length: featured ? 4 : 2 }).map((_, tagIndex) => (
+                <span key={`${index}-tag-${tagIndex}`} className='h-7 w-18 rounded-md border border-[var(--border-main)] bg-[var(--bg-elevated)]' />
+              ))}
+            </div>
+            <span className='h-4 w-16 rounded bg-[var(--bg-soft)]' />
+          </div>
+        </div>
+      </div>
+    </article>
+  )
+
   return (
     <section id='feed' className='w-full overflow-x-clip bg-[var(--bg-page)] px-4 py-16 text-[var(--text-main)] sm:px-6 lg:px-8'>
       <div className='mx-auto w-full max-w-screen-2xl'>
         <div className='flex min-w-0 flex-col gap-6 border-b border-[var(--border-main)] pb-7 xl:flex-row xl:items-end xl:justify-between'>
           <div className='min-w-0'>
-            <p className='font-mono text-sm uppercase tracking-[0.38em] text-[var(--text-dim)]'>// all logs * {visiblePosts.length} hits</p>
+            <p className='font-mono text-sm uppercase tracking-[0.38em] text-[var(--text-dim)]'>// all logs * {blogsLoading ? 'syncing' : `${visiblePosts.length} hits`}</p>
             <div className='mt-4 flex flex-wrap gap-2 font-mono text-sm'>
               {categoryCounts.map((item) => (
                 <button key={item.name} onClick={() => setCategory(item.name)} className={`rounded-md px-3 py-2 transition ${category === item.name ? 'bg-[var(--bg-soft)] text-[var(--accent)]' : 'bg-[var(--bg-elevated)] text-[var(--text-faint)] hover:text-[var(--text-strong)]'}`}>
@@ -213,7 +344,16 @@ const BlogList = () => {
           </div>
         </div>
 
-        {lead ? (
+        {blogsLoading ? (
+          <div id='archive' className='spark-board mt-10 grid w-full grid-cols-1 overflow-hidden rounded-lg border border-white/12 md:grid-cols-2 lg:grid-cols-4'>
+            {skeletonPosts.map((post, index) => (
+              <React.Fragment key={post.key}>
+                <SkeletonCard index={index} featured={post.featured} span={post.span} className='border-b md:border-r' />
+                {index === 3 && <AboutMe />}
+              </React.Fragment>
+            ))}
+          </div>
+        ) : lead ? (
           <div id='archive' className='spark-board mt-10 grid w-full grid-cols-1 overflow-hidden rounded-lg border border-white/12 md:grid-cols-2 lg:grid-cols-4'>
             <PostCard post={lead} index={0} featured className='border-b md:border-r' />
             {remainingPosts.map((post, index) => (

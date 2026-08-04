@@ -17,8 +17,8 @@ const Header = () => {
 
         <dl className='mt-14 grid max-w-4xl overflow-hidden rounded-lg border border-[var(--border-main)] bg-[var(--bg-elevated)] sm:grid-cols-2 lg:grid-cols-4'>
           {[
-            ['Stack', 'Full-stack products'],
-            ['Runtime', 'Software Engineer'],
+            ['Stack', ' AI products'],
+            ['Runtime', 'AIML Engineer'],
             ['Region', 'Bengaluru, IN'],
             ['Longest trace', '14 min'],
           ].map(([label, value]) => (

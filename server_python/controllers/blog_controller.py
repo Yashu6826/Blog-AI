@@ -156,7 +156,7 @@ async def get_my_blogs(author: dict):
     return {"success": True, "blogs": [serialize_blog(blog) for blog in await cursor.to_list(length=None)]}
 
 
-async def get_blog_by_id(blog_id: str):
+async def get_blog_by_id(blog_id: str, user: dict | None = None):
     db = get_db()
     try:
         query = {"_id": ObjectId(blog_id)} if ObjectId.is_valid(blog_id) else {"slug": blog_id}
@@ -166,8 +166,21 @@ async def get_blog_by_id(blog_id: str):
 
     if not doc:
         return {"success": False, "message": "Blog not found"}
-    await db["blogs"].update_one({"_id": doc["_id"]}, {"$inc": {"reads": 1}, "$set": {"updatedAt": doc.get("updatedAt") or _now()}})
-    doc["reads"] = int(doc.get("reads") or 0) + 1
+
+    is_owner = bool(
+        user
+        and (
+            user.get("role") == "admin"
+            or user.get("_id") == doc.get("authorId")
+        )
+    )
+    if not doc.get("isPublished") and not is_owner:
+        return {"success": False, "message": "Blog not found"}
+
+    if doc.get("isPublished"):
+        await db["blogs"].update_one({"_id": doc["_id"]}, {"$inc": {"reads": 1}, "$set": {"updatedAt": doc.get("updatedAt") or _now()}})
+        doc["reads"] = int(doc.get("reads") or 0) + 1
+
     return {"success": True, "blog": serialize_blog(doc)}
 
 async def get_related_blogs(
@@ -235,11 +248,16 @@ async def toggle_publish(blog_id: str, user: dict | None = None):
         {"$set": {
             "isPublished": new_val,
             "status": "published" if new_val else "draft",
-            "publishedAt": now if new_val else doc.get("publishedAt"),
+            "publishedAt": now if new_val else None,
             "updatedAt": now,
         }}
     )
-    return {"success": True, "message": "Blog status updated"}
+    updated = await db["blogs"].find_one({"_id": ObjectId(blog_id)})
+    return {
+        "success": True,
+        "message": "Blog published successfully" if new_val else "Blog moved back to drafts",
+        "blog": serialize_blog(updated),
+    }
 
 async def add_comment(blog: str, name: str, content: str):
     db = get_db()

@@ -2,7 +2,6 @@ import {createContext, useContext, useEffect, useState} from 'react'
 import axios from "axios";
 import {useNavigate} from 'react-router-dom'
 import toast from 'react-hot-toast';
-import Loader from '../components/Loader';
 
 
 
@@ -29,14 +28,14 @@ export const AppProvider = ({ children })=>{
     const [user, setUser] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
-    const [loading,setLoading] = useState(false)
+    const [blogsLoading, setBlogsLoading] = useState(true)
     const [authReady, setAuthReady] = useState(false)
 
     // console.log("my key is ",import.meta.env.VITE_BASE_URL);
 
     const fetchBlogs = async () => {
     try {
-        setLoading(true);
+        setBlogsLoading(true);
         const timestamp = new Date().getTime();
         const {data} = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/blog/all`, {
             params: { timestamp },
@@ -56,7 +55,7 @@ export const AppProvider = ({ children })=>{
         console.error('Fetch blogs error:', error);
         toast.error(error.response?.data?.message || error.message);
     }finally{
-        setLoading(false);
+        setBlogsLoading(false);
     }
 }
 
@@ -87,12 +86,12 @@ export const AppProvider = ({ children })=>{
     const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark')
 
     const value = {
-        axios, navigate, token, setToken, user, setUser, blogs, setBlogs, input, setInput, authReady, canWrite, theme, toggleTheme
+        axios, navigate, token, setToken, user, setUser, blogs, setBlogs, blogsLoading, fetchBlogs, input, setInput, authReady, canWrite, theme, toggleTheme
     }
 
     return (
         <AppContext.Provider value={value}>
-             {loading ? <Loader /> : children}
+             {children}
         </AppContext.Provider>
     )
 }

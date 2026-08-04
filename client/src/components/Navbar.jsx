@@ -28,7 +28,7 @@ const Navbar = () => {
             <UserCircle2 className='h-4 w-4' />
             <span>profile</span>
           </a>
-          {user && <Link to='/admin/stories' className='hidden items-center gap-2 transition hover:text-[var(--text-strong)] md:flex'><Workflow className='h-4 w-4' /><span>workspace</span></Link>}
+          {canWrite && <Link to='/admin/stories' className='hidden items-center gap-2 transition hover:text-[var(--text-strong)] md:flex'><Workflow className='h-4 w-4' /><span>workspace</span></Link>}
           <button onClick={toggleTheme} className='flex items-center gap-2 rounded-md border border-[var(--border-main)] bg-[var(--bg-elevated)] px-3 py-2 text-[var(--text-dim)] transition hover:border-[var(--accent-border)] hover:text-[var(--accent)]'>
             {theme === 'dark' ? <SunMedium className='h-4 w-4' /> : <MoonStar className='h-4 w-4' />}
             <span>{theme === 'dark' ? 'light' : 'dark'}</span>

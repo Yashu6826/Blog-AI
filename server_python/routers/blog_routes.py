@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Request
-from middleware.auth import get_current_user
+from middleware.auth import get_current_user, get_optional_user
 from controllers.blog_controller import (
     add_blog,
     get_all_blogs,
@@ -50,8 +50,8 @@ async def related_blogs(
     return await get_related_blogs(category, exclude)
 
 @router.get("/{blogId}")
-async def route_by_id(blogId: str):
-    return await get_blog_by_id(blogId)
+async def route_by_id(blogId: str, user: dict | None = Depends(get_optional_user)):
+    return await get_blog_by_id(blogId, user)
 
 @router.post("/delete")
 async def route_delete(payload: dict, user: dict = Depends(get_current_user)):

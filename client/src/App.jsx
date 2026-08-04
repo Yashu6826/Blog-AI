@@ -5,6 +5,7 @@ import Blog from './pages/Blog';
 import Layout from './pages/admin/Layout';
 import AddBlog from './pages/admin/AddBlog';
 import Auth from './pages/Auth';
+import MyStories from './pages/admin/MyStories';
 import 'quill/dist/quill.snow.css';
 import { Toaster } from 'react-hot-toast';
 import { useAppContext } from './context/AppContext';
@@ -39,8 +40,8 @@ const App = () => {
         <Route path="/admin" element={<Layout />}>
           <Route path="addBlog" element={<OwnerRoute><AddBlog /></OwnerRoute>} />
           <Route index element={<Navigate to="/" replace />} />
-          <Route path="stories" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
-          <Route path="listBlog" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
+          <Route path="stories" element={<OwnerRoute><MyStories /></OwnerRoute>} />
+          <Route path="listBlog" element={<OwnerRoute><MyStories /></OwnerRoute>} />
           <Route path="comments" element={<OwnerRoute><Navigate to="/admin/addBlog" replace /></OwnerRoute>} />
         </Route>
 

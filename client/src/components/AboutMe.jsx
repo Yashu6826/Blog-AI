@@ -1,11 +1,15 @@
 import React from 'react'
-import { BriefcaseBusiness, Code2, Globe, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
+import { FaGithub, FaLinkedinIn } from 'react-icons/fa'
+import { SiLeetcode } from 'react-icons/si'
+import { RiGlobalLine } from 'react-icons/ri'
 
 const profileLinks = [
-  { label: 'GitHub', href: '#', icon: Code2 },
-  { label: 'LinkedIn', href: '#', icon: BriefcaseBusiness },
-  { label: 'Website', href: '#', icon: Globe },
-  { label: 'Email', href: '#', icon: Mail },
+  { label: 'GitHub', href: 'https://github.com/Yashu6826', icon: FaGithub },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/yashraj-gupta-803282251/', icon: FaLinkedinIn },
+  { label: 'LeetCode', href: 'https://leetcode.com/u/yashrajgupta6826/', icon: SiLeetcode },
+  { label: 'Blog', href: 'https://portfolio-website-nine-theta-99.vercel.app/', icon: RiGlobalLine },
+  { label: 'Email', href: 'mailto:yashrajgupta6826@gmail.com', icon: Mail },
 ]
 
 const AboutMe = () => {
@@ -23,7 +27,7 @@ const AboutMe = () => {
 
         <p className='mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-[var(--accent)]'>// maintainer</p>
         <h2 className='mt-1.5 max-w-3xl text-base font-bold leading-snug tracking-tight text-[var(--text-strong)] sm:text-lg'>
-          Yashraj Gupta, writing about full-stack engineering, AI features, production systems, and the work behind shipping better software.
+          Yashraj Gupta, writing about full-stack engineering, AI Agents, production systems, and the work behind shipping better software.
         </h2>
         <p className='mt-1.5 font-mono text-[11px] text-[var(--text-faint)]'>12 posts</p>
 
@@ -36,6 +40,8 @@ const AboutMe = () => {
             <a
               key={link.label}
               href={link.href}
+              target='_blank'
+              rel='noreferrer'
               aria-label={link.label}
               className='grid h-7 min-w-7 place-items-center rounded-md border border-[var(--border-main)] bg-[var(--bg-elevated)] px-2 font-mono text-[10px] font-semibold text-[var(--text-dim)] transition hover:border-[var(--accent-border)] hover:bg-[var(--bg-soft)] hover:text-[var(--accent)]'
             >

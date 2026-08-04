@@ -10,7 +10,7 @@ const Footer = () => (
         <a href='#archive' className='inline-flex items-center gap-2 hover:text-[var(--accent)]'><FolderGit2 className='h-4 w-4' />commits</a>
         <a href='#about' className='inline-flex items-center gap-2 hover:text-[var(--accent)]'><UserCircle2 className='h-4 w-4' />profile</a>
       </div>
-      <p>(c) {new Date().getFullYear()} QuickBlog</p>
+      <p>(c) {new Date().getFullYear()} QuickBlog. All rights reserved.</p>
     </div>
   </footer>
 )
